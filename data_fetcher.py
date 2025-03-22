@@ -14,19 +14,27 @@ class DataFetcher:
         self.lookback = lookback
 
     def fetch_data(self):
-        """Binance'tan ham veriyi çeker."""
-        klines = self.client.get_historical_klines(
+        """Fetches data from Binance API and returns as DataFrame."""
+        klines = self.get_klines()
+        df = self.get_dataframe(klines)
+        df[["open", "high", "low", "close"]] = df[["open", "high", "low", "close"]].astype(float)
+        df["timestamp"] = pd.to_datetime(df["timestamp"], unit="ms")
+        return df
+
+    def get_klines(self):
+        """Functions to get klines from Binance API."""
+        return self.client.get_historical_klines(
             self.symbol,
             self.interval,
             self.lookback
         )
-        df = pd.DataFrame(klines)[[0, 1, 2, 3, 4]].rename(columns={
+
+    def get_dataframe(self, klines_):
+        """Returns DataFrame from klines."""
+        return pd.DataFrame(klines_)[[0, 1, 2, 3, 4]].rename(columns={
             0: "timestamp",
             1: "open",
             2: "high",
             3: "low",
             4: "close"
         })
-        df[["open", "high", "low", "close"]] = df[["open", "high", "low", "close"]].astype(float)
-        df["timestamp"] = pd.to_datetime(df["timestamp"], unit="ms")
-        return df
