@@ -3,8 +3,10 @@ from typing import Tuple
 import matplotlib.pyplot as plt
 import pandas as pd
 
+
 class PricePlotter:
     """Class to plot price data."""
+
     def __init__(self, df: pd.DataFrame):
         self.df = df
         self.fig, self.ax = plt.subplots(figsize=(14, 7))
@@ -12,13 +14,44 @@ class PricePlotter:
 
     def _setup_base_plot(self):
         """Draws the base plot."""
-        self.ax.plot(self.df["timestamp"], self.df["close"], label="Fiyat", color="blue")
+        self.ax.plot(self.df["timestamp"], self.df["close"],
+                     label="Fiyat", color="blue")
 
-    def add_buy_zone(self, buy_zone: Tuple[float, float]):
-        """Adds buy zone to the plot."""
+    def add_buy_zone_comparison(self, zone1: Tuple[float, float], zone2: Tuple[float, float]):
+        """
+        Shows the two buy zones comparatively on the plot.
+        Parameters:
+        zone1: (lower1, upper1) - First buy zone
+        zone2: (lower2, upper2) - Second buy zone
+        """
+        lower1, upper1 = zone1
+        lower2, upper2 = zone2
+
+        # Transparent red fill between upper borders
+        self.ax.axhspan(
+            ymin=min(upper1, upper2),
+            ymax=max(upper1, upper2),
+            color='red',
+            alpha=0.2,
+            label='Üst Alım Bölgeleri Arası'
+        )
+
+        # Transparent green fill between lower borders
+        self.ax.axhspan(
+            ymin=min(lower1, lower2),
+            ymax=max(lower1, lower2),
+            color='green',
+            alpha=0.2,
+            label='Alt Alım Bölgeleri Arası'
+        )
+
+    def add_single_buy_zone(self, buy_zone: Tuple[float, float]):
+        """Single buy zone lines (optional)."""
         lower, upper = buy_zone
-        self.ax.axhline(y=upper, color="green", linestyle="--", label="Alım Üst Sınırı")
-        self.ax.axhline(y=lower, color="red", linestyle="--", label="Alım Alt Sınırı")
+        self.ax.axhline(upper, color='darkred', ls='--',
+                        lw=1, label='Üst Sınır')
+        self.ax.axhline(lower, color='darkgreen',
+                        ls='--', lw=1, label='Alt Sınır')
 
     def add_support_levels(self, support_levels: list):
         """Adds support levels to the plot."""

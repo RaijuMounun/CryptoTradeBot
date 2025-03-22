@@ -8,19 +8,21 @@ def main():
     """Main function to run the bot."""
     # Fetch data
     data_fetcher = DataFetcher(
-        symbol="BTCUSDT", interval="15m", lookback="30d")
+        symbol="BTCUSDT", interval="15m", lookback="7d")
     df = data_fetcher.fetch_data()
 
     # Calculate support and buy zone
     analyzer = SupportAnalyzer(df, window=20)
     support_indices = analyzer.find_support_levels()
+    mean_zone = analyzer.calculate_mean_based_buy_zone(sensitivity=1)
+    median_zone = analyzer.calculate_median_based_buy_zone(iqr_multiplier=1.5)
     buy_zone = analyzer.calculate_mean_based_buy_zone()
 
     current_price = df["close"].iloc[-1]
 
     # Draw plot
     plotter = PricePlotter(df)
-    plotter.add_buy_zone(buy_zone)
+    plotter.add_buy_zone_comparison(mean_zone, median_zone)
     plotter.add_support_levels(support_indices)
     plotter.add_current_price(current_price)
     plotter.customize_plot(
