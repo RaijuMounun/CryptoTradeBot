@@ -26,7 +26,7 @@ class SupportAnalyzer:
         self.support_levels = self.df.iloc[minima_indices]["low"].values
         return self.support_levels
 
-    def calculate_mean_based_ideal_buy_zone(self, sensitivity=1):
+    def calculate_mean_based_buy_zone(self, sensitivity=1):
         """Method to calculate buy zone based on mean and standard deviation.
         Returns lower and upper buy zone in tuple."""
         if self.support_levels is None:
