@@ -5,10 +5,13 @@ import pandas as pd
 
 
 class PricePlotter:
-    """Class to plot price data."""
+    """Class to plot price data. \n
+    Candle count can be specified to plot last n candles, or can be left None to plot all.
+    """
 
-    def __init__(self, df: pd.DataFrame):
-        self.df = df
+    def __init__(self, df: pd.DataFrame, candle_count: int = None):
+        plt.style.use('dark_background')
+        self.df = df if candle_count is None else df.iloc[-candle_count:]
         self.fig, self.ax = plt.subplots(figsize=(14, 7))
         self._setup_base_plot()
 
@@ -44,14 +47,6 @@ class PricePlotter:
             alpha=0.2,
             label='Alt Alım Bölgeleri Arası'
         )
-
-    def add_single_buy_zone(self, buy_zone: Tuple[float, float]):
-        """Single buy zone lines (optional)."""
-        lower, upper = buy_zone
-        self.ax.axhline(upper, color='darkred', ls='--',
-                        lw=1, label='Üst Sınır')
-        self.ax.axhline(lower, color='darkgreen',
-                        ls='--', lw=1, label='Alt Sınır')
 
     def add_support_levels(self, support_levels: list):
         """Adds support levels to the plot."""
