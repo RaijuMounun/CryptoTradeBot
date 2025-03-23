@@ -36,7 +36,7 @@ class PricePlotter:
             ymax=max(upper1, upper2),
             color='red',
             alpha=0.2,
-            label='Üst Alım Bölgeleri Arası'
+            label='Buy Zone Top'
         )
 
         # Transparent green fill between lower borders
@@ -45,19 +45,34 @@ class PricePlotter:
             ymax=max(lower1, lower2),
             color='green',
             alpha=0.2,
-            label='Alt Alım Bölgeleri Arası'
+            label='Buy Zone Bottom'
         )
 
     def add_support_levels(self, support_levels: list):
-        """Adds support levels to the plot."""
-        valid_levels = [i for i in support_levels if i < len(self.df)]
-        self.ax.scatter(
-            self.df["timestamp"].iloc[valid_levels],
-            self.df["low"].iloc[valid_levels],
-            color="orange",
-            marker="^",
-            label="Destek Seviyeleri"
-        )
+        """
+        Adds support levels to the plot as scatter points.
+        Parameters:
+        support_levels (list): A list of price values representing support levels.
+        """
+        if len(support_levels) == 0:
+            print("Warning: No support levels found.") # todo raise exception instead of print
+            
+            return
+
+        # Destek seviyelerini scatter olarak ekle
+        for level in support_levels:
+            # Destek seviyesine karşılık gelen zaman damgasını bul
+            timestamps = self.df[self.df["low"] == level]["timestamp"]
+            if timestamps.empty:
+                continue
+            self.ax.scatter(
+                timestamps,
+                [level] * len(timestamps),  # Destek seviyesi fiyatı
+                color="orange",  # Turuncu renk
+                marker="^",     # Üçgen işaretleyici
+                s=100,          # İşaretleyici boyutu
+                label="Destek Seviyeleri" if level == support_levels[0] else None  # Sadece ilk seviyeye etiket ekle
+            )
 
     def add_current_price(self, current_price: float):
         """Adds current price to the plot."""
