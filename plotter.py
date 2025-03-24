@@ -55,9 +55,7 @@ class PricePlotter:
         support_levels (list): A list of price values representing support levels.
         """
         if len(support_levels) == 0:
-            print("Warning: No support levels found.") # todo raise exception instead of print
-            
-            return
+            raise ValueError("No support levels found.")
 
         # Destek seviyelerini scatter olarak ekle
         for level in support_levels:
@@ -71,7 +69,8 @@ class PricePlotter:
                 color="orange",  # Turuncu renk
                 marker="^",     # Üçgen işaretleyici
                 s=100,          # İşaretleyici boyutu
-                label="Destek Seviyeleri" if level == support_levels[0] else None  # Sadece ilk seviyeye etiket ekle
+                # Sadece ilk seviyeye etiket ekle
+                label="Destek Seviyeleri" if level == support_levels[0] else None
             )
 
     def add_current_price(self, current_price: float):
@@ -81,7 +80,7 @@ class PricePlotter:
             current_price,
             color="purple",
             s=100,
-            label="Şu Anki Fiyat"
+            label="Current Price"
         )
 
     def customize_plot(self, title: str):

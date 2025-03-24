@@ -17,7 +17,8 @@ class DataFetcher:
         """Fetches data from Binance API and returns as DataFrame."""
         klines = self.get_klines()
         df = self.get_dataframe(klines)
-        df[["open", "high", "low", "close"]] = df[["open", "high", "low", "close"]].astype(float)
+        df[["open", "high", "low", "close"]] = df[["open", "high", "low", "close"]].astype("float32")
+        #df["volume"] = df["volume"].astype("int32")
         df["timestamp"] = pd.to_datetime(df["timestamp"], unit="ms")
         return df
 
