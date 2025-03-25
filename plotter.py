@@ -18,7 +18,69 @@ class PricePlotter:
     def _setup_base_plot(self):
         """Draws the base plot."""
         self.ax.plot(self.df["timestamp"], self.df["close"],
-                     label="Fiyat", color="blue")
+                     label="Fiyat", color="blue", alpha=0.7)
+
+    def add_sell_zone_comparison(self, zone1: Tuple[float, float], zone2: Tuple[float, float]):
+        """
+        Compare two sell zones.
+        Parameters:
+        zone1: (lower1, upper1) - First sell zone
+        zone2: (lower2, upper2) - Second sell zone
+        """
+        lower1, upper1 = zone1
+        lower2, upper2 = zone2
+
+        # Upper zone (more aggressive selling)
+        self.ax.axhspan(
+            ymin=min(upper1, upper2),
+            ymax=max(upper1, upper2),
+            color='purple',
+            alpha=0.3,
+            label='Sell Zone (Aggressive)'
+        )
+
+        # Lower zone (conservative selling)
+        self.ax.axhspan(
+            ymin=min(lower1, lower2),
+            ymax=max(lower1, lower2),
+            color='orange',
+            alpha=0.3,
+            label='Sell Zone (Conservative)'
+        )
+
+    def add_resistance_levels(self, resistance_levels: list):
+        """
+        Add resistance levels to the plot.
+        Parameters:
+        resistance_levels (list): List of resistance prices.
+        """
+        if len(resistance_levels) == 0:
+            raise ValueError("Direnç seviyesi bulunamadı.")
+
+        # Mark resistance levels
+        for level in resistance_levels:
+            timestamps = self.df[self.df["high"] == level]["timestamp"]
+            if timestamps.empty:
+                continue
+            self.ax.scatter(
+                timestamps,
+                [level] * len(timestamps),
+                color="red",
+                marker="v",
+                s=100,
+                label="Direnç Seviyeleri" if level == resistance_levels[0] else None
+            )
+
+    def add_sell_zone(self, sell_zone: Tuple[float, float], color: str = "cyan"):
+        """Adds a single sales territory."""
+        lower, upper = sell_zone
+        self.ax.axhspan(
+            lower,
+            upper,
+            color=color,
+            alpha=0.2,
+            label=f"Sell Zone ({lower:.2f}-{upper:.2f})"
+        )
 
     def add_buy_zone_comparison(self, zone1: Tuple[float, float], zone2: Tuple[float, float]):
         """
@@ -57,19 +119,19 @@ class PricePlotter:
         if len(support_levels) == 0:
             raise ValueError("No support levels found.")
 
-        # Destek seviyelerini scatter olarak ekle
+        # Add support levels as scatters
         for level in support_levels:
-            # Destek seviyesine karşılık gelen zaman damgasını bul
+            # Find timestamp corresponding to support level
             timestamps = self.df[self.df["low"] == level]["timestamp"]
             if timestamps.empty:
                 continue
             self.ax.scatter(
                 timestamps,
-                [level] * len(timestamps),  # Destek seviyesi fiyatı
-                color="orange",  # Turuncu renk
-                marker="^",     # Üçgen işaretleyici
-                s=100,          # İşaretleyici boyutu
-                # Sadece ilk seviyeye etiket ekle
+                [level] * len(timestamps),  # Support level price
+                color="orange",
+                marker="^",
+                s=100,
+                # Just add labels to the first level
                 label="Destek Seviyeleri" if level == support_levels[0] else None
             )
 
