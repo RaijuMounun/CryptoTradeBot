@@ -63,3 +63,24 @@ class SupportAnalyzer:
         buy_zone_lower = median - (iqr_multiplier * iqr)
         buy_zone_upper = median  # or + (iqr_multiplier * iqr)
         return (buy_zone_lower, buy_zone_upper)
+
+    def calculate_unified_buy_zone(self, sensitivity=1, iqr_multiplier=1.5):
+        """Method to calculate a single unified buy zone based on the midpoints of 
+        mean-based and median-based buy zones.
+        Returns lower and upper buy zone in tuple."""
+        # Calculate both buy zones
+        mean_buy_zone = self.calculate_mean_based_buy_zone(sensitivity)
+        median_buy_zone = self.calculate_median_based_buy_zone(iqr_multiplier)
+
+        # Calculate midpoints of each zone
+        mean_midpoint_lower = mean_buy_zone[0]
+        mean_midpoint_upper = mean_buy_zone[1]
+
+        median_midpoint_lower = median_buy_zone[0]
+        median_midpoint_upper = median_buy_zone[1]
+
+        # Create a unified buy zone between the midpoints
+        unified_lower = min(mean_midpoint_lower, median_midpoint_lower)
+        unified_upper = max(mean_midpoint_upper, median_midpoint_upper)
+
+        return (unified_lower, unified_upper)

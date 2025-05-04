@@ -110,6 +110,23 @@ class PricePlotter:
             label='Buy Zone Bottom'
         )
 
+    def add_unified_buy_zone(self, zone: Tuple[float, float]):
+        """
+        Shows a single unified buy zone on the plot.
+        Parameters:
+        zone: (lower, upper) - Unified buy zone
+        """
+        lower, upper = zone
+
+        # Transparent blue fill for the unified zone
+        self.ax.axhspan(
+            ymin=lower,
+            ymax=upper,
+            color='blue',
+            alpha=0.3,
+            label='Unified Buy Zone'
+        )
+
     def add_support_levels(self, support_levels: list):
         """
         Adds support levels to the plot as scatter points.
