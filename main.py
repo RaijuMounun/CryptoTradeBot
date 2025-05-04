@@ -1,13 +1,13 @@
 """Main module for bot."""
-from plotter import PricePlotter
-from support_analyzer import SupportAnalyzer
-from resistance_analyzer import ResistanceAnalyzer
+from Plotting.plotter import PricePlotter
+from Analyze.support_analyzer import SupportAnalyzer
+from Analyze.resistance_analyzer import ResistanceAnalyzer
 from data_fetcher import DataFetcher
 
 
 def main():
     """Main function to run the bot."""
-    data_fetcher = DataFetcher(symbol="DOGEUSDT", interval="15m", lookback="4d")
+    data_fetcher = DataFetcher(symbol="ETHUSDT", interval="15m", lookback="14d")
     df = data_fetcher.fetch_data()
     current_price = df["close"].iloc[-1]
 
