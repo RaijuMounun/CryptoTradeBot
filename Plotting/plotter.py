@@ -2,6 +2,7 @@
 from typing import Tuple
 import matplotlib.pyplot as plt
 import pandas as pd
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 
 class PricePlotter:
@@ -9,16 +10,17 @@ class PricePlotter:
     Candle count can be specified to plot last n candles, or can be left None to plot all.
     """
 
-    def __init__(self, df: pd.DataFrame, candle_count: int = None):
+    def __init__(self, df: pd.DataFrame, candle_count: int = None, plot_frame=None):
         plt.style.use('dark_background')
         self.df = df if candle_count is None else df.iloc[-candle_count:]
         self.fig, self.ax = plt.subplots(figsize=(14, 7))
         self._setup_base_plot()
+        self.plot_frame = plot_frame  # Tkinter frame where the plot will be shown
 
     def _setup_base_plot(self):
         """Draws the base plot."""
         self.ax.plot(self.df["timestamp"], self.df["close"],
-                     label="Fiyat", color="blue", alpha=0.7)
+                     label="Price", color="blue", alpha=0.7)
 
     def add_sell_zone_comparison(self, zone1: Tuple[float, float], zone2: Tuple[float, float]):
         """
@@ -55,7 +57,7 @@ class PricePlotter:
         resistance_levels (list): List of resistance prices.
         """
         if len(resistance_levels) == 0:
-            raise ValueError("Direnç seviyesi bulunamadı.")
+            raise ValueError("Couldn't found any resistance level.")
 
         # Mark resistance levels
         for level in resistance_levels:
@@ -149,7 +151,7 @@ class PricePlotter:
                 marker="^",
                 s=100,
                 # Just add labels to the first level
-                label="Destek Seviyeleri" if level == support_levels[0] else None
+                label="Support levels" if level == support_levels[0] else None
             )
 
     def add_current_price(self, current_price: float):
@@ -162,18 +164,28 @@ class PricePlotter:
             label="Current Price"
         )
 
-    def customize_plot(self, title: str):
+    def customize_plot(self, pair):
         """Customizes the plot."""
-        self.ax.set_title(title)
-        self.ax.set_xlabel("Tarih")
-        self.ax.set_ylabel("Fiyat (USDT)")
+        _title = f"Pair: {pair} | Current Price: {self.df['close'].iloc[-1]:.8f}"
+        self.ax.set_title(_title)
+        self.ax.set_xlabel("Date")
+        self.ax.set_ylabel("Price (USDT)")
         self.ax.legend()
         plt.xticks(rotation=45)
         plt.tight_layout()
 
+    def show_on_tkinter(self):
+        """Shows the plot inside the Tkinter window."""
+        if self.plot_frame:  # Check if a plot_frame is provided
+            canvas = FigureCanvasTkAgg(self.fig, master=self.plot_frame)
+            canvas.draw()
+            canvas.get_tk_widget().pack()  # Add the plot canvas to the Tkinter window
+        else:
+            print("No Tkinter frame provided to show the plot.")
+
     def show(self):
         """Shows the plot."""
-        plt.show()
+        self.show_on_tkinter()
 
     def save(self, filename: str = "price_chart.png"):
         """Saves the plot."""
