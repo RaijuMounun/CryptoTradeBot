@@ -1,8 +1,10 @@
 """Main module for bot."""
+import customtkinter as ctk
 from Plotting.plotter import PricePlotter
 from Analyze.support_analyzer import SupportAnalyzer
 from Analyze.resistance_analyzer import ResistanceAnalyzer
-from data_fetcher import DataFetcher
+from DataFetcher.data_fetcher import DataFetcher
+from gui.main_window import MainWindow
 
 
 def main():
@@ -11,6 +13,13 @@ def main():
         symbol="ETHUSDT", interval="15m", lookback="14d")
     df = data_fetcher.fetch_data()
     current_price = df["close"].iloc[-1]
+
+    ctk.set_appearance_mode("Dark")  # or "Light"
+    ctk.set_default_color_theme("dark-blue")  # customtkinter theme
+
+    root = ctk.CTk()
+    app = MainWindow(root)
+    app.run()
 
     draw_plot(df=df, current_price=current_price)
 
